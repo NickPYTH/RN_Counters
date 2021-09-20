@@ -1,0 +1,42 @@
+{
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject"
+  },
+  "dependencies": {
+    "@expo-google-fonts/inter": "^0.2.0",
+    "@expo/vector-icons": "^12.0.0",
+    "@gorhom/bottom-sheet": "^4.0.3",
+    "expo": "^42.0.0",
+    "expo-app-loading": "^1.1.2",
+    "expo-camera": "~11.2.2",
+    "expo-font": "~9.2.1",
+    "expo-sqlite": "~9.2.1",
+    "prettier": "^2.3.2",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
+    "react-native-chart-kit": "^6.11.0",
+    "react-native-gesture-handler": "~1.10.2",
+    "react-native-material-switch": "^0.0.4",
+    "react-native-reanimated": "^2.2.0",
+    "react-native-root-toast": "^3.2.1",
+    "react-native-screens": "~3.4.0",
+    "react-native-svg": "12.1.1",
+    "react-native-web": "~0.13.12",
+    "react-navigation": "^4.0.10",
+    "react-navigation-header-buttons": "^3.0.4",
+    "react-navigation-stack": "^1.10.3",
+    "react-navigation-tabs": "^2.5.6",
+    "react-redux": "^7.2.4",
+    "toggle-switch-react-native": "^3.2.0"
+  },
+  "devDependencies": {
+    "babel-preset-expo": "8.3.0"
+  },
+  "private": true
+}
