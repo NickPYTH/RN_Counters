@@ -9,6 +9,9 @@ import { addCounterRecord } from "../store/actions";
 import { THEME } from "../theme";
 
 export const WaterCounter = ({ navigation, flats, addCounterRecord }) => {
+  const flatName = navigation.getParam("flatName", "");
+  const hotWaterRecords = flats.countersRecords.filter(record=>record.counterType === 'hot' && record.flatName === flatName);
+  const coldWaterRecords = flats.countersRecords.filter(record=>record.counterType === 'cold' && record.flatName === flatName);
   const [visibleModal, setVisibleModal] = useState(false);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const zipIn = () => {
@@ -24,7 +27,6 @@ export const WaterCounter = ({ navigation, flats, addCounterRecord }) => {
       duration: 300,
     }).start();
   };
-  const flatName = navigation.getParam("flatName", "");
   const [waterType, setWaterType] = useState("hot");
   const counters = flats.countersRecords;
   let hotRecords = [];
@@ -49,13 +51,6 @@ export const WaterCounter = ({ navigation, flats, addCounterRecord }) => {
     }).start();
   };
 
-  const fadeOut = () => {
-    Animated.timing(modalFadeAnim, {
-      useNativeDriver: false,
-      toValue: 0,
-      duration: 1000,
-    }).start();
-  };
   return (
     <ScrollView>
       <Animated.View
@@ -100,152 +95,153 @@ export const WaterCounter = ({ navigation, flats, addCounterRecord }) => {
             />
           </View>
         </View>
-        {flats.countersRecords.length > 0 ? (
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{
-              paddingLeft: 5,
-              borderWidth: 1,
-              ...(waterType === "hot"
-                ? { borderTopColor: THEME.DANGER_COLOR }
-                : { borderTopColor: THEME.BLUE_COLOR }),
-              borderBottomColor: THEME.LIGHT_COLOR,
-              borderLeftColor: THEME.LIGHT_COLOR,
-              borderRightColor: THEME.LIGHT_COLOR,
-              borderTopRightRadius: 0,
-              borderTopLeftRadius: 0,
-              borderRadius: 15,
-            }}
-          >
+        {(hotWaterRecords.length === 0 && waterType === 'hot') || (coldWaterRecords.length === 0 && waterType === 'cold') ? (
             <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: 10,
-              }}
+                style={{
+                  flex: 1,
+                  alignContent: "center",
+                  justifyContent: "center",
+                }}
             >
-              <AppTextRegular value="Показания" />
-              <AppTextRegular value="Расход" />
-              <AppTextRegular value="Стоимость" />
-              <AppTextRegular value="Дата поверки" />
+              {waterType === "hot" ? (
+                  <Image source={require("../../assets/plumberingHot.png")} />
+              ) : (
+                  <Image source={require("../../assets/plumberingCold.png")} />
+              )}
             </View>
-            {waterType === "hot"
-              ? hotRecords.map((record) => {
-                  hotRecordsCounter += 1;
-                  if (
-                    record.counterType === waterType &&
-                    record.flatName === flatName
-                  ) {
-                    return (
-                      <View style={{ height: 30 }}>
-                        <View
-                          style={{
-                            paddingHorizontal: 10,
-                            flex: 1,
-                            justifyContent: "space-between",
-                            flexDirection: "row",
-                            alignItems: "center",
-                          }}
-                        >
-                          <View style={{ width: 66 }}>
-                            <AppTextRegular
-                              value={record.value}
-                              styles={{
-                                color:
-                                  waterType === "hot"
-                                    ? THEME.DANGER_COLOR
-                                    : THEME.BLUE_COLOR,
-                                fontSize: 18,
-                              }}
-                            />
-                          </View>
-                          <View style={{ width: 40 }}>
-                            <AppTextRegular
-                              value={
-                                hotRecordsCounter == 1
-                                  ? "0_o"
-                                  : record.value -
-                                    hotRecords[hotRecordsCounter - 2].value
-                              }
-                            />
-                          </View>
-                          <View style={{ width: 50 }}>
-                            <AppTextRegular value={1000} />
-                          </View>
+        ): (
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={{
+                  paddingLeft: 5,
+                  borderWidth: 1,
+                  ...(waterType === "hot"
+                      ? { borderTopColor: THEME.DANGER_COLOR }
+                      : { borderTopColor: THEME.BLUE_COLOR }),
+                  borderBottomColor: THEME.LIGHT_COLOR,
+                  borderLeftColor: THEME.LIGHT_COLOR,
+                  borderRightColor: THEME.LIGHT_COLOR,
+                  borderTopRightRadius: 0,
+                  borderTopLeftRadius: 0,
+                  borderRadius: 15,
+                }}
+            >
+              <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: 10,
+                  }}
+              >
+                <AppTextRegular value="Показания" />
+                <AppTextRegular value="Расход" />
+                <AppTextRegular value="Стоимость" />
+                <AppTextRegular value="Дата поверки" />
+              </View>
+              {waterType === "hot"
+                  ? hotRecords.map((record) => {
+                    hotRecordsCounter += 1;
+                    if (
+                        record.counterType === waterType &&
+                        record.flatName === flatName
+                    ) {
+                      return (
+                          <View style={{ height: 30 }}>
+                            <View
+                                style={{
+                                  paddingHorizontal: 10,
+                                  flex: 1,
+                                  justifyContent: "space-between",
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                }}
+                            >
+                              <View style={{ width: 66 }}>
+                                <AppTextRegular
+                                    value={record.value}
+                                    styles={{
+                                      color:
+                                          waterType === "hot"
+                                              ? THEME.DANGER_COLOR
+                                              : THEME.BLUE_COLOR,
+                                      fontSize: 18,
+                                    }}
+                                />
+                              </View>
+                              <View style={{ width: 40 }}>
+                                <AppTextRegular
+                                    value={
+                                      hotRecordsCounter === 1
+                                          ? "0_o"
+                                          : record.value -
+                                          hotRecords[hotRecordsCounter - 2].value
+                                    }
+                                />
+                              </View>
+                              <View style={{ width: 50 }}>
+                                <AppTextRegular value={1000} />
+                              </View>
 
-                          <AppTextRegular value={record.recordDate} />
-                        </View>
-                      </View>
-                    );
-                  }
-                })
-              : coldRecords.map((record) => {
-                  coldRecordsCounter += 1;
-                  if (
-                    record.counterType === waterType &&
-                    record.flatName === flatName
-                  ) {
-                    return (
-                      <View style={{ height: 30 }}>
-                        <View
-                          style={{
-                            paddingHorizontal: 10,
-                            flex: 1,
-                            justifyContent: "space-between",
-                            flexDirection: "row",
-                            alignItems: "center",
-                          }}
-                        >
-                          <View style={{ width: 66 }}>
-                            <AppTextRegular
-                              value={record.value}
-                              styles={{
-                                color:
-                                  waterType === "hot"
-                                    ? THEME.DANGER_COLOR
-                                    : THEME.BLUE_COLOR,
-                                fontSize: 18,
-                              }}
-                            />
+                              <AppTextRegular value={record.recordDate} />
+                            </View>
                           </View>
-                          <View style={{ width: 40 }}>
-                            <AppTextRegular
-                              value={
-                                coldRecordsCounter == 1 ? (
-                                  <AppTextRegular value="0_o" />
-                                ) : (
-                                  record.value -
-                                  coldRecords[coldRecordsCounter - 2].value
-                                )
-                              }
-                            />
+                      );
+                    }
+                  })
+                  : coldRecords.map((record) => {
+                    coldRecordsCounter += 1;
+                    if (
+                        record.counterType === waterType &&
+                        record.flatName === flatName
+                    ) {
+                      return (
+                          <View style={{ height: 30 }}>
+                            <View
+                                style={{
+                                  paddingHorizontal: 10,
+                                  flex: 1,
+                                  justifyContent: "space-between",
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                }}
+                            >
+                              <View style={{ width: 66 }}>
+                                <AppTextRegular
+                                    value={record.value}
+                                    styles={{
+                                      color:
+                                          waterType === "hot"
+                                              ? THEME.DANGER_COLOR
+                                              : THEME.BLUE_COLOR,
+                                      fontSize: 18,
+                                    }}
+                                />
+                              </View>
+                              <View style={{ width: 40 }}>
+                                <AppTextRegular
+                                    value={
+                                      coldRecordsCounter === 1 ? (
+                                          <AppTextRegular value="0_o" />
+                                      ) : (
+                                          record.value -
+                                          coldRecords[coldRecordsCounter - 2].value
+                                      )
+                                    }
+                                />
+                              </View>
+                              <View style={{ width: 50 }}>
+                                <AppTextRegular value={1000} />
+                              </View>
+                              <AppTextRegular value={record.recordDate} />
+                            </View>
                           </View>
-                          <View style={{ width: 50 }}>
-                            <AppTextRegular value={1000} />
-                          </View>
-                          <AppTextRegular value={record.recordDate} />
-                        </View>
-                      </View>
-                    );
-                  }
-                })}
-          </ScrollView>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              alignContent: "center",
-              justifyContent: "center",
-            }}
-          >
-            {waterType === "hot" ? (
-              <Image source={require("../../assets/plumberingHot.png")} />
-            ) : (
-              <Image source={require("../../assets/plumberingCold.png")} />
-            )}
-          </View>
+                      );
+                    }
+                  })}
+            </ScrollView>
+
         )}
       </Animated.View>
       <View style={styles.settingsWrapper}>
@@ -306,7 +302,7 @@ export const WaterCounter = ({ navigation, flats, addCounterRecord }) => {
           fadeIn={fadeIn}
         />
       ) : (
-        <View></View>
+        <View/>
       )}
     </ScrollView>
   );
