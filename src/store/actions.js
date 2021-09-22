@@ -25,3 +25,17 @@ export const addCounter = (counterInfo) => {
     payload: counterInfo,
   };
 };
+
+export const removeRecord = (record) => {
+  return {
+    type: "REMOVE_RECORD",
+    payload: recordInfo,
+  };
+};
+
+export const updateRecord = (record, value) => {
+  return {
+    type: "UPDATE_RECORD",
+    payload: {record, value},
+  };
+};

@@ -19,7 +19,7 @@ export const AppTextinput = (props) => {
   );
 };
 
-styles = StyleSheet.create({
+const styles = StyleSheet.create({
   wrapper: {
     marginBottom: 15,
     marginLeft: 15,

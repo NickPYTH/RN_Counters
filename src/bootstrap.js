@@ -39,7 +39,7 @@ function addDataToDb() {
       }
     );
     tx.executeSql(
-      "create table if not exists countersRecords (id integer primary key not null, flatName text, counterType text, value integer, recordDate text);",
+      "create table if not exists countersRecords (id integer primary key not null, flatName text, counterType text, value text, recordDate text);",
       null,
       (t, info) => {},
       (t, error) => {
