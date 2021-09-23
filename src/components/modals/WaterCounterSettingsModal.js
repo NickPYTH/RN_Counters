@@ -1,19 +1,46 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Modal, StyleSheet, TouchableHighlight, View } from "react-native";
+import {Modal, StyleSheet, TextInput, TouchableHighlight, View} from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { addCounter, addFlat } from "../../store/actions";
+import { updateCounter } from "../../store/actions";
 import { THEME } from "../../theme";
 import { AppButton } from "../UI/AppButton";
 import { AppTextinput } from "../UI/AppTextInput";
 import { AppTextRegular } from "../UI/AppTextRegular";
+import Toast from "react-native-root-toast";
+import {openDatabase} from "expo-sqlite";
 
-const App = ({ setVisible, fadeIn, addFlat, addCounter }) => {
-  const [counterRate, setCounterRate] = useState("100");
-  const saveChanges = () => {
-    console.log("saved");
-  };
+const App = ({ setVisible, fadeIn, updateCounter, counter, flats}) => {
+
+  const [value, setValue] = useState(counter.rate.toString());
+    const saveChanges = () => {
+        if (value.trim().length === 0){
+            Toast.show('Показание должно минимум 1 цифру')
+        }
+        else{
+            const db = openDatabase("db");
+            db.transaction((tx) => {
+                if (counter.counterType === 'hot')
+                    tx.executeSql(
+                        "update counters set rate = ? where flatName = ? and counterType = ?",
+                        [value, counter.flatName, 'water'],
+                        () =>{updateCounter(counter, value)},
+                        () => {}
+                    );
+                else
+                    tx.executeSql(
+                        "update counters set secondRate = ? where flatName = ? and counterType = ?",
+                        [value, counter.flatName, 'water'],
+                        () =>{updateCounter(counter, value)},
+                        () => {
+                        }
+                    );
+            });
+
+            setVisible(false);
+        }
+    };
   return (
     <View style={styles.centeredView}>
       <Modal
@@ -39,7 +66,6 @@ const App = ({ setVisible, fadeIn, addFlat, addCounter }) => {
                     color: THEME.DARK_COLOR,
                     fontSize: 20,
                     fontWeight: "400",
-                    //borderColor: THEME.BLUE_COLOR,
                   }}
                   value="Параметры счётчика"
                 />
@@ -64,10 +90,9 @@ const App = ({ setVisible, fadeIn, addFlat, addCounter }) => {
                   flex: 1,
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  alignItems: "flex-start",
+                  alignItems: "center",
                 }}
               >
-                <View style={{ margin: 15 }}>
                   <AppTextRegular
                     styles={{
                       color: THEME.DARK_COLOR,
@@ -76,13 +101,14 @@ const App = ({ setVisible, fadeIn, addFlat, addCounter }) => {
                     }}
                     value="Стоимость за куб/м"
                   />
-                </View>
 
-                <AppTextinput
-                  styles={{ width: 100, margin: 0 }}
-                  onChange={() => {}}
-                  placeholder={counterRate}
-                />
+                  <TextInput value={value}
+                             onChangeText={(text) => {
+                                 setValue(text);
+                             }}
+                             placeholder={value.toString()}
+                             keyboardType='number-pad'
+                             style={{borderColor: THEME.MAIN_COLOR, borderBottomWidth: 1, width: 100, fontSize: 18}}/>
               </View>
               <View
                 style={{
@@ -117,8 +143,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {
-      addFlat,
-      addCounter,
+        updateCounter
     },
     dispatch
   );

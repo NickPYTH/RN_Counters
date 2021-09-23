@@ -21,8 +21,8 @@ const App = ({setVisible, fadeIn, record, updateRecord}) => {
             const db = openDatabase("db");
             db.transaction((tx) => {
                 tx.executeSql(
-                    "update countersRecords set value = ? where flatName = ? and counterType = ? and value = ? and recordDate = ?",
-                    [value, record.flatName, record.counterType, record.value, record.recordDate],
+                    "update counters set rate = ? where flatName = ? and counterType = ?",
+                    [value, record.flatName, record.counterType],
                     () =>{updateRecord(record, value)},
                     () => {
                     }

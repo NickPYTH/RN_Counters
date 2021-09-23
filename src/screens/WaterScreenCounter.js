@@ -12,6 +12,7 @@ import Toast from "react-native-root-toast";
 import {openDatabase} from 'expo-sqlite';
 
 export const WaterCounter = ({navigation, flats, removeRecord}) => {
+    const [waterType, setWaterType] = useState("hot");
     const flatName = navigation.getParam("flatName", "");
     const [editMode, setEditMode] = useState(false);
     const [editableRecord, setEditableRecord] = useState({});
@@ -26,15 +27,14 @@ export const WaterCounter = ({navigation, flats, removeRecord}) => {
             duration: 300,
         }).start();
     };
-
     const zipOut = () => {
         Animated.timing(fadeAnim, {
             toValue: 1,
             duration: 300,
         }).start();
     };
-    const [waterType, setWaterType] = useState("hot");
     const counters = flats.countersRecords;
+    const counterRate = flats.counters.find(counter=>counter.flatName===flatName && counter.counterType==='water');
     let hotRecords = [];
     let coldRecords = [];
     let hotRecordsCounter = 0;
@@ -223,7 +223,12 @@ export const WaterCounter = ({navigation, flats, removeRecord}) => {
                                                     }
                                                     {editMode ? <View/> :
                                                         <View style={{width: 40}}>
-                                                            <AppTextRegular value={1000}/>
+                                                            <AppTextRegular value={
+                                                                hotRecordsCounter === 1
+                                                                    ? "0_o"
+                                                                    : (record.value -
+                                                                    hotRecords[hotRecordsCounter - 2].value) * counterRate.rate
+                                                            }/>
                                                         </View>
                                                     }
                                                     <AppTextRegular styles={{marginLeft: editMode ? 20 : 0}}
@@ -326,7 +331,12 @@ export const WaterCounter = ({navigation, flats, removeRecord}) => {
                                                 }
                                                 {editMode ? <View/> :
                                                     <View style={{width: 40}}>
-                                                        <AppTextRegular value={1000}/>
+                                                        <AppTextRegular
+                                                            value={ coldRecordsCounter === 1
+                                                                ? "0_o"
+                                                                : (record.value -
+                                                                coldRecords[coldRecordsCounter - 2].value)*counterRate.secondRate}
+                                                            />
                                                     </View>
                                                 }
                                                 <AppTextRegular styles={{marginLeft: editMode ? 20 : 0}}
@@ -365,7 +375,7 @@ export const WaterCounter = ({navigation, flats, removeRecord}) => {
                                                                 tx.executeSql(
                                                                     "delete from countersRecords where flatName = ? and counterType = ? and value = ? and recordDate = ?",
                                                                     [record.flatName, record.counterType, record.value, record.recordDate],
-                                                                    () =>{},
+                                                                    () =>{removeRecord(record)},
                                                                     () => {
                                                                     }
                                                                 );
@@ -439,6 +449,11 @@ export const WaterCounter = ({navigation, flats, removeRecord}) => {
             </View>
             {visibleModal ? (
                 <WaterCounterSettingsModal
+                    counter={{
+                        flatName,
+                        counterType: waterType === 'hot' ? 'hot' : 'cold',
+                        rate: counterRate.rate
+                    }}
                     setVisible={setVisibleModal}
                     fadeIn={fadeIn}
                 />

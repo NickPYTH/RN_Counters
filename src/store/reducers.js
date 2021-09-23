@@ -131,14 +131,15 @@ const Flats = (state = INITIAL_STATE, action) => {
                 countersRecords: records,
             };
         case "REMOVE_RECORD":
-            let tmp = state.countersRecords
-            let new_tmp = []
+            console.log('here')
+            let tmp = state.countersRecords;
+            let new_tmp = [];
             tmp.map(record => {
 
                 if (record.counterType == action.payload.counterType && record.flatName == action.payload.flatName && record.recordDate == action.payload.recordDate && record.value == action.payload.value){
 
                 }else{
-                    new_tmp.push(record)
+                    new_tmp.push(record);
                 }
             })
             return {
@@ -146,8 +147,8 @@ const Flats = (state = INITIAL_STATE, action) => {
                 countersRecords: new_tmp
             };
         case "UPDATE_RECORD":
-            tmp = state.countersRecords
-            console.log(action.payload)
+            tmp = state.countersRecords;
+            console.log(action.payload);
             new_tmp = []
             tmp.map(record => {
                 if (record.counterType == action.payload.record.counterType && record.flatName == action.payload.record.flatName && record.recordDate == action.payload.record.recordDate){
@@ -158,6 +159,24 @@ const Flats = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 countersRecords: new_tmp
+            };
+        case "UPDATE_COUNTER":
+            tmp = state.counters
+            let tmp_val = {}
+            tmp.map(counter=>{
+                if (counter.flatName == action.payload.counter.flatName && counter.counterType == 'water'){
+                    console.log(new Date())
+                    if (action.payload.counter.counterType === 'hot'){
+                        counter.rate = action.payload.rate
+                    }
+                    else{
+                        counter.secondRate = action.payload.rate
+                    }
+                }
+            });
+            return {
+                ...state,
+                counters: tmp,
             };
         default:
             return state;
